@@ -8,3 +8,4 @@ exemples d'exports/
 node_modules/
 dist/
 *.tsbuildinfo
+.claude/
