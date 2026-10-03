@@ -1,0 +1,10 @@
+# Exports démarches-simplifiées : données personnelles, ne jamais versionner
+exemples d'exports/
+*.csv
+*.zip
+*.pdf
+*.ods
+*.xlsx
+node_modules/
+dist/
+*.tsbuildinfo
