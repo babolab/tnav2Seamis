@@ -13,6 +13,7 @@ Afin d'être plus rapidement et efficacement expoitables, ces informations ont e
 - Le code capable de faire cela devra être compatible avec mon code outils-cross sur github, auteur babolab.
 - il est envisagé ensuite une focntionnalité sur grist avec one trick pony
 - il ne faut exporter que les dossiers pour lesquels la case "Entré dans Seamis" n'est pas déjà cochée.
+- Pour retrouver le navire dans la base Seamis afin d'y ajouter le pdf, il faut entrer un champ de recherche écrit comme tel : mmsi:227123456, cs:FAG1234, immat:123456, nom:LE NOM DU NAVIRE
 
 ---
 
