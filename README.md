@@ -48,7 +48,7 @@ La variable `VITE_BASE_URL` fixe le chemin de base du build (`/tnav2Seamis/` sur
 
 ```
 src/
-├── App.tsx                      coquille provisoire (en-tête CROSS Jobourg)
+├── App.tsx                      coquille minimale, sans en-tête (affichée seule ou dans outils_cross)
 ├── lib/utils.ts                 utilitaire cn() (clsx + tailwind-merge)
 └── modules/tnav/
     ├── TnavModule.tsx           interface React : dépôt du fichier, actions à faire, entrées, dossiers, anomalies
