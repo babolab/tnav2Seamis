@@ -2,7 +2,7 @@
 
 Ce guide s'adresse aux opérateurs du CROSS Jobourg chargés de reporter dans Seamis les déclarations de traversée (TNAV) déposées sur démarches-simplifiées.
 
-**En résumé :** télécharger l'export .ods, le déposer dans l'outil, copier chaque clé et chaque texte dans la base balises de Seamis, verser les PDF au navire, puis cocher « Entré dans Seamis » dans démarches-simplifiées.
+**En résumé :** télécharger l'export .ods, le déposer dans l'outil, copier chaque clé et chaque texte dans la base balises de Seamis, retrouver chaque navire avec la recherche Seamis fournie et y verser le PDF, puis cocher « Entré dans Seamis » dans démarches-simplifiées.
 
 Outil en ligne : <https://babolab.github.io/tnav2Seamis/>
 
@@ -30,10 +30,11 @@ L'outil affiche alors :
 | Déjà dans Seamis | dossiers dont la case « Entré dans Seamis? » est cochée : ignorés |
 | Dossiers à traiter | dossiers non cochés et non archivés |
 | Entrées balises | nombre de clés à saisir dans Seamis |
-| Saisies cochées | votre avancement (cases « Saisie dans Seamis ») |
 | Erreurs | anomalies bloquantes pour une entrée (voir § 5) |
 
 Tous les états de dossier sont traités (en construction, en instruction, accepté…), sauf les dossiers archivés.
+
+Le cadre **Actions à faire** rappelle les trois étapes (entrées balises, PDF, case démarches-simplifiées) et suit votre avancement d'après les cases que vous cochez sur les cartes. Une étape terminée passe au vert.
 
 ## 3. Saisir les entrées dans la base balises de Seamis
 
@@ -81,12 +82,22 @@ Une mise à jour de traversée arrive sous la forme d'un **nouveau dossier**. Si
 
 ## 4. Verser les PDF au navire
 
-L'outil ne traite pas les PDF. Pour chaque dossier de la liste **Dossiers à traiter** :
+L'outil ne traite pas les PDF. Chaque dossier de la liste **Dossiers à traiter** a sa carte. Pour chacun :
 
-1. Retrouver le PDF du dossier dans le ZIP téléchargé à l'étape 1 (le n° de dossier figure dans le nom du fichier).
-2. Le verser dans les **pièces jointes de l'entrée navire** dans Seamis.
+1. Cliquer sur **Copier la recherche** et coller la chaîne dans la recherche de Seamis pour retrouver le navire. Elle reprend les identifiants du navire séparés par une virgule, par exemple :
+   ```
+   mmsi:227000001, cs:FAX0000, immat:XX00000, nom:NAVIRE A
+   ```
+   - Les critères non renseignés dans le dossier sont omis.
+   - MMSI, indicatif (`cs`) et immatriculation sont écrits sans espace ; l'indicatif, l'immatriculation et le nom sont en majuscules.
+   - Si le dossier ne donne aucun identifiant du navire, la carte le signale : retrouver le navire à partir du PDF.
+2. Retrouver le PDF du dossier dans le ZIP téléchargé à l'étape 1 (le n° de dossier figure dans le nom du fichier).
+3. Le verser dans les **pièces jointes de l'entrée navire** dans Seamis.
+4. Cocher **PDF versé au navire dans Seamis** sur la carte.
 
 Les dossiers sans balise apparaissent aussi dans cette liste : ils ne donnent aucune entrée balise, mais leur PDF doit quand même être versé au navire.
+
+Comme la case « Saisie dans Seamis » des entrées balises, ces cases ne servent qu'à suivre votre avancement : elles ne sont pas enregistrées.
 
 ## 5. Vérifier les anomalies
 
@@ -108,6 +119,7 @@ Une fois les entrées saisies et les PDF versés :
 
 1. Cliquer sur **Copier les n° de dossier** au-dessus de la liste des dossiers à traiter, pour les avoir sous la main.
 2. Dans démarches-simplifiées, cocher la case **« Entré dans Seamis? »** de chacun de ces dossiers.
+3. Cocher la case correspondante sur la carte du dossier dans l'outil : la carte s'estompe quand le PDF est versé et la case cochée.
 
 **C'est cette case qui fait l'historique.** L'outil ne la coche pas : tant qu'elle n'est pas cochée, le dossier sera de nouveau proposé au prochain export, et ses textes seraient collés une deuxième fois dans Seamis.
 

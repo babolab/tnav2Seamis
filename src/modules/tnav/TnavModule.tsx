@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
-import { AlertCircle, AlertTriangle, Check, CheckCircle, Copy, Info, Ship, Upload } from 'lucide-react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { AlertCircle, AlertTriangle, Check, CheckCircle, Copy, FileText, Info, Search, Ship, Upload } from 'lucide-react'
 import { cn } from '../../lib/utils'
-import { traiterExportOds } from './core'
-import type { Anomalie, EntreeBalise, ResultatTraitement } from './core'
+import { rechercheSeamis, traiterExportOds } from './core'
+import type { Anomalie, Dossier, EntreeBalise, ResultatTraitement } from './core'
 
 async function copierPressePapiers(texte: string): Promise<void> {
   if (navigator.clipboard?.writeText) {
@@ -104,10 +104,98 @@ function CarteEntree({ entree, saisie, basculer, onCopie }: {
   )
 }
 
+function CaseAction({ coche, basculer, libelle }: { coche: boolean; basculer: () => void; libelle: ReactNode }) {
+  return (
+    <label className={cn('flex items-center gap-2 text-xs cursor-pointer select-none', coche ? 'text-green-300' : 'text-slate-300')}>
+      <input type="checkbox" checked={coche} onChange={basculer} className="accent-green-500" />
+      {libelle}
+    </label>
+  )
+}
+
+function CarteDossier({ dossier: d, anomalies, pdfVerse, basculerPdf, dsCoche, basculerDs, onCopie }: {
+  dossier: Dossier
+  anomalies: Anomalie[]
+  pdfVerse: boolean
+  basculerPdf: () => void
+  dsCoche: boolean
+  basculerDs: () => void
+  onCopie: (ok: boolean) => void
+}) {
+  const recherche = rechercheSeamis(d)
+  const termine = pdfVerse && dsCoche
+  return (
+    <div className={cn('bg-slate-800 rounded-xl p-4 space-y-3 border border-slate-700 transition-opacity', termine && 'opacity-50')}>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <span className="font-mono text-lg text-slate-100 select-all">{d.numero}</span>
+        <span className="text-sm text-slate-200"><Ship size={14} className="inline mr-1 text-slate-500" />{d.navire.nom || 'navire sans nom'}</span>
+        <span className="text-xs text-slate-400">
+          déposé {formatDepot(d.dateDepot)} · {d.etat || 'état inconnu'} · {d.balises.length} balise{d.balises.length > 1 ? 's' : ''}
+        </span>
+      </div>
+
+      {/* Recherche du navire dans Seamis */}
+      <div className="bg-slate-950 rounded-lg p-3 space-y-2">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-300"><Search size={13} /> Recherche Seamis</span>
+          {recherche.texte ? (
+            <>
+              <code className="font-mono text-sm text-slate-100 select-all break-all">{recherche.texte}</code>
+              <BoutonCopier texte={recherche.texte} libelle="Copier la recherche" onCopie={onCopie} />
+            </>
+          ) : (
+            <span className="text-xs text-amber-300">Aucun identifiant du navire : le retrouver à partir du PDF.</span>
+          )}
+        </div>
+        <p className="flex items-center gap-1.5 text-xs text-slate-400">
+          <FileText size={13} /> PDF : fichier du dossier <span className="font-mono text-slate-300">{d.numero}</span> dans le ZIP de l'export, à verser dans les pièces jointes du navire.
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-x-6 gap-y-2">
+        <CaseAction coche={pdfVerse} basculer={basculerPdf} libelle="PDF versé au navire dans Seamis" />
+        <CaseAction coche={dsCoche} basculer={basculerDs} libelle="« Entré dans Seamis? » coché dans démarches-simplifiées" />
+      </div>
+
+      <ListeAnomalies anomalies={anomalies} />
+    </div>
+  )
+}
+
+function Action({ numero, fait, total, children }: { numero: number; fait: number; total: number; children: ReactNode }) {
+  const termine = total > 0 && fait >= total
+  return (
+    <li className="flex items-start gap-3">
+      <span className={cn('shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold mt-0.5',
+        termine ? 'bg-green-700 text-green-100' : 'bg-slate-700 text-slate-300')}>
+        {termine ? <Check size={12} /> : numero}
+      </span>
+      <span className="flex-1 text-slate-400">{children}</span>
+      <span className={cn('shrink-0 text-xs font-mono mt-0.5', termine ? 'text-green-400' : 'text-slate-300')}>{fait} / {total}</span>
+    </li>
+  )
+}
+
+/** Ensemble d'identifiants cochés, avec bascule. */
+function useCoches() {
+  const [coches, setCoches] = useState<Set<string>>(new Set())
+  const basculer = (id: string) =>
+    setCoches(prev => {
+      const suivant = new Set(prev)
+      if (suivant.has(id)) suivant.delete(id)
+      else suivant.add(id)
+      return suivant
+    })
+  const vider = () => setCoches(new Set())
+  return { coches, basculer, vider }
+}
+
 export default function TnavModule() {
   const [nomFichier, setNomFichier] = useState('')
   const [resultat, setResultat] = useState<ResultatTraitement | null>(null)
-  const [saisies, setSaisies] = useState<Set<string>>(new Set())
+  const saisies = useCoches()
+  const pdfVerses = useCoches()
+  const casesDs = useCoches()
   const [erreur, setErreur] = useState('')
   const [chargement, setChargement] = useState(false)
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null)
@@ -135,7 +223,9 @@ export default function TnavModule() {
     try {
       setResultat(await traiterExportOds(await fichier.arrayBuffer()))
       setNomFichier(fichier.name)
-      setSaisies(new Set())
+      saisies.vider()
+      pdfVerses.vider()
+      casesDs.vider()
     } catch (e) {
       setResultat(null)
       setErreur(e instanceof Error ? e.message : String(e))
@@ -143,14 +233,6 @@ export default function TnavModule() {
       setChargement(false)
     }
   }
-
-  const basculerSaisie = (id: string) =>
-    setSaisies(prev => {
-      const suivant = new Set(prev)
-      if (suivant.has(id)) suivant.delete(id)
-      else suivant.add(id)
-      return suivant
-    })
 
   const r = resultat
   const nbErreurs = r ? [...r.anomalies, ...r.entrees.flatMap(e => e.anomalies)].filter(a => a.gravite === 'erreur').length : 0
@@ -191,13 +273,12 @@ export default function TnavModule() {
       {r && (
         <>
           {/* Statistiques */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {[
               { libelle: "Dossiers dans l'export", valeur: r.totalDossiers, couleur: 'text-blue-300' },
               { libelle: 'Déjà dans Seamis', valeur: r.dossiersExclus.filter(d => d.raison === 'entré dans Seamis').length, couleur: 'text-slate-300' },
               { libelle: 'Dossiers à traiter', valeur: r.dossiersATraiter.length, couleur: 'text-green-400' },
               { libelle: 'Entrées balises', valeur: r.entrees.length, couleur: 'text-green-400' },
-              { libelle: 'Saisies cochées', valeur: `${saisies.size} / ${r.entrees.length}`, couleur: 'text-slate-300' },
               { libelle: 'Erreurs', valeur: nbErreurs, couleur: nbErreurs ? 'text-red-400' : 'text-slate-300' },
             ].map(s => (
               <div key={s.libelle} className="bg-slate-800 rounded-xl p-3 text-center">
@@ -207,62 +288,53 @@ export default function TnavModule() {
             ))}
           </div>
 
-          {/* Mode opératoire */}
-          <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-sm text-slate-300 space-y-1">
-            <p className="font-semibold text-slate-200">Mode opératoire</p>
-            <ol className="list-decimal list-inside space-y-0.5 text-slate-400">
-              <li>Pour chaque entrée : copier la clé, puis le texte, dans la base balises de Seamis. Si la balise existe déjà, coller le texte <strong>en tête</strong> du texte existant.</li>
-              <li>Verser le PDF de chaque dossier à traiter (ZIP de démarches-simplifiées) dans les pièces jointes du navire Seamis.</li>
-              <li>Cocher « Entré dans Seamis » dans démarches-simplifiées pour chaque dossier à traiter (liste plus bas).</li>
+          {/* Actions à faire */}
+          <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-sm text-slate-300 space-y-2">
+            <p className="font-semibold text-slate-200">Actions à faire</p>
+            <ol className="space-y-1.5">
+              <Action numero={1} fait={saisies.coches.size} total={r.entrees.length}>
+                <strong className="text-slate-300">Entrées balises</strong> : pour chaque entrée, copier la clé puis le texte
+                dans la base balises de Seamis. Si la balise existe déjà, coller le texte <strong>en tête</strong> du texte existant.
+              </Action>
+              <Action numero={2} fait={pdfVerses.coches.size} total={r.dossiersATraiter.length}>
+                <strong className="text-slate-300">PDF</strong> : pour chaque dossier, copier la recherche Seamis pour retrouver
+                le navire, puis verser le PDF du dossier (ZIP de démarches-simplifiées) dans ses pièces jointes.
+              </Action>
+              <Action numero={3} fait={casesDs.coches.size} total={r.dossiersATraiter.length}>
+                <strong className="text-slate-300">démarches-simplifiées</strong> : cocher « Entré dans Seamis? » pour chaque dossier à traiter.
+              </Action>
             </ol>
           </div>
 
           {/* Entrées balises */}
           <section className="space-y-3">
-            <h2 className="text-lg font-semibold text-slate-200">Entrées balises à saisir ({r.entrees.length})</h2>
+            <h2 className="text-lg font-semibold text-slate-200">1. Entrées balises à saisir ({r.entrees.length})</h2>
             {r.entrees.length === 0 && (
               <p className="text-sm text-slate-400">Aucune balise à saisir dans les dossiers à traiter.</p>
             )}
             {r.entrees.map(e => {
               const id = `${e.typeCle}:${e.cle}`
-              return <CarteEntree key={id} entree={e} saisie={saisies.has(id)} basculer={() => basculerSaisie(id)} onCopie={surCopie} />
+              return <CarteEntree key={id} entree={e} saisie={saisies.coches.has(id)} basculer={() => saisies.basculer(id)} onCopie={surCopie} />
             })}
           </section>
 
           {/* Dossiers à traiter */}
           <section className="space-y-3">
             <div className="flex flex-wrap items-center gap-3">
-              <h2 className="text-lg font-semibold text-slate-200">Dossiers à traiter ({r.dossiersATraiter.length})</h2>
+              <h2 className="text-lg font-semibold text-slate-200">2. et 3. Dossiers à traiter ({r.dossiersATraiter.length})</h2>
               {r.dossiersATraiter.length > 0 && (
                 <BoutonCopier texte={r.dossiersATraiter.map(d => d.numero).join('\n')} libelle="Copier les n° de dossier" onCopie={surCopie} />
               )}
             </div>
-            <div className="overflow-x-auto rounded-xl border border-slate-700">
-              <table className="w-full text-sm">
-                <thead className="bg-slate-800 text-slate-400 text-xs">
-                  <tr>
-                    <th className="text-left px-3 py-2">N° dossier</th>
-                    <th className="text-left px-3 py-2">Navire</th>
-                    <th className="text-left px-3 py-2">Dépôt</th>
-                    <th className="text-left px-3 py-2">État</th>
-                    <th className="text-center px-3 py-2">Balises</th>
-                    <th className="text-left px-3 py-2">Anomalies</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {r.dossiersATraiter.map(d => (
-                    <tr key={d.numero} className="border-t border-slate-700 align-top">
-                      <td className="px-3 py-2 font-mono">{d.numero}</td>
-                      <td className="px-3 py-2"><Ship size={13} className="inline mr-1 text-slate-500" />{d.navire.nom || '—'}</td>
-                      <td className="px-3 py-2 whitespace-nowrap text-slate-400">{formatDepot(d.dateDepot)}</td>
-                      <td className="px-3 py-2 text-slate-400">{d.etat || '—'}</td>
-                      <td className="px-3 py-2 text-center">{d.balises.length}</td>
-                      <td className="px-3 py-2"><ListeAnomalies anomalies={anomaliesParDossier(d.numero)} /></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {r.dossiersATraiter.length === 0 && (
+              <p className="text-sm text-slate-400">Aucun dossier à traiter.</p>
+            )}
+            {r.dossiersATraiter.map(d => (
+              <CarteDossier key={d.numero} dossier={d} anomalies={anomaliesParDossier(d.numero)}
+                pdfVerse={pdfVerses.coches.has(d.numero)} basculerPdf={() => pdfVerses.basculer(d.numero)}
+                dsCoche={casesDs.coches.has(d.numero)} basculerDs={() => casesDs.basculer(d.numero)}
+                onCopie={surCopie} />
+            ))}
           </section>
 
           {/* Dossiers exclus */}

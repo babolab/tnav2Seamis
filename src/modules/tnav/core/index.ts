@@ -17,4 +17,6 @@ export async function traiterExportOds(
 export { lireOds, lireContenuOds } from './odsReader'
 export { lireDossiers } from './exportDS'
 export { traiter, texteBloc, MAX_LIGNES, MENTION_PDF } from './generation'
+export { rechercheSeamis, critereTexte } from './recherche'
+export type { CritereRecherche, PrefixeRecherche, RechercheSeamis } from './recherche'
 export * from './types'

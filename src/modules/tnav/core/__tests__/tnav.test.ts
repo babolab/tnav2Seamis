@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { lireContenuOds, MAX_LIGNES, MENTION_PDF, traiterExportOds } from '../index'
+import { lireContenuOds, MAX_LIGNES, MENTION_PDF, rechercheSeamis, traiterExportOds } from '../index'
 import { contenuOds, fabriquerOds } from './fabriquerOds'
 import { FEUILLES_TEST } from './jeuDeTest'
 
@@ -112,6 +112,27 @@ describe('entrées balises', () => {
         expect(bloc.split('\n').length).toBeLessThanOrEqual(MAX_LIGNES + 2)
       }
     }
+  })
+})
+
+describe('recherche Seamis', () => {
+  it('compose la chaîne de recherche du navire, identifiants normalisés', async () => {
+    const r = await resultatTest()
+    const d2 = r.dossiersATraiter.find(d => d.numero === '10000002')!
+    expect(rechercheSeamis(d2).texte).toBe('mmsi:227000001, cs:FAX0000, immat:XX00000, nom:NAVIRE A')
+  })
+
+  it('omet les critères vides', async () => {
+    const r = await resultatTest()
+    const d3 = r.dossiersATraiter.find(d => d.numero === '10000003')!
+    expect(rechercheSeamis(d3).texte).toBe('mmsi:235000000, nom:NAVIRE B')
+  })
+
+  it('retire les virgules du nom, qui séparent les critères', async () => {
+    const r = await resultatTest()
+    const d = structuredClone(r.dossiersATraiter[0])
+    d.navire = { ...d.navire, mmsi: '', indicatif: '', immatriculation: 'ch 123 456', nom: 'Le Nom, du navire' }
+    expect(rechercheSeamis(d).texte).toBe('immat:CH123456, nom:LE NOM DU NAVIRE')
   })
 })
 

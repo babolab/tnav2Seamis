@@ -14,6 +14,8 @@ Les plaisanciers déclarent leur traversée sur démarches-simplifiées : navire
 - génère **une entrée par identifiant de balise** : une balise qui a un HEXID et un MMSI donne deux entrées au même texte ;
 - normalise les clés (aucun espace, HEXID en majuscules, MMSI en chiffres seuls) ;
 - produit un texte court (10 lignes au plus) encadré par des délimiteurs portant le n° de dossier, pour pouvoir empiler les mises à jour dans Seamis ;
+- fournit pour chaque dossier la chaîne de recherche du navire dans Seamis (`mmsi:…, cs:…, immat:…, nom:…`), à copier pour y verser le PDF ;
+- suit l'avancement des actions à faire (entrées balises saisies, PDF versés, cases cochées dans démarches-simplifiées), sans rien enregistrer ;
 - signale les anomalies sans bloquer : HEXID ou MMSI invalide, préfixe AIS inattendu, pavillon incohérent avec le MID du MMSI, dossier sans balise, absence de contact à terre…
 
 L'outil ne traite pas les PDF et ne coche pas la case « Entré dans Seamis? » : ces deux étapes restent manuelles.
@@ -49,7 +51,7 @@ src/
 ├── App.tsx                      coquille provisoire (en-tête CROSS Jobourg)
 ├── lib/utils.ts                 utilitaire cn() (clsx + tailwind-merge)
 └── modules/tnav/
-    ├── TnavModule.tsx           interface React : dépôt du fichier, entrées, dossiers, anomalies
+    ├── TnavModule.tsx           interface React : dépôt du fichier, actions à faire, entrées, dossiers, anomalies
     └── core/                    cœur du traitement, TypeScript pur, sans React
         ├── index.ts             point d'entrée : traiterExportOds()
         ├── odsReader.ts         lecture de l'ods (JSZip + XML), booléens office:value
@@ -57,6 +59,7 @@ src/
         ├── normalisation.ts     valeurs vides, clés, dates, téléphones
         ├── controles.ts         contrôles de cohérence (anomalies)
         ├── generation.ts        clés, textes, fusion des dossiers qui partagent une clé
+        ├── recherche.ts         chaîne de recherche du navire dans Seamis
         ├── types.ts             modèle de données
         └── __tests__/           tests, export ods fabriqué et anonymisé
 ```
