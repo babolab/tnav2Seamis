@@ -119,7 +119,7 @@ describe('recherche Seamis', () => {
   it('compose la chaîne de recherche du navire, identifiants normalisés', async () => {
     const r = await resultatTest()
     const d2 = r.dossiersATraiter.find(d => d.numero === '10000002')!
-    expect(rechercheSeamis(d2).texte).toBe('mmsi:227000001, cs:FAX0000, immat:XX00000, nom:NAVIRE A')
+    expect(rechercheSeamis(d2).texte).toBe('mmsi:227000001, cs:FAX0000, immat:00000, nom:NAVIRE A')
   })
 
   it('omet les critères vides', async () => {
@@ -132,7 +132,20 @@ describe('recherche Seamis', () => {
     const r = await resultatTest()
     const d = structuredClone(r.dossiersATraiter[0])
     d.navire = { ...d.navire, mmsi: '', indicatif: '', immatriculation: 'ch 123 456', nom: 'Le Nom, du navire' }
-    expect(rechercheSeamis(d).texte).toBe('immat:CH123456, nom:LE NOM DU NAVIRE')
+    expect(rechercheSeamis(d).texte).toBe('immat:123456, nom:LE NOM DU NAVIRE')
+  })
+
+  it("retire les lettres du quartier maritime de l'immatriculation", async () => {
+    const r = await resultatTest()
+    const d = structuredClone(r.dossiersATraiter[0])
+    const immat = (valeur: string) => {
+      d.navire = { ...d.navire, mmsi: '', indicatif: '', nom: '', immatriculation: valeur }
+      return rechercheSeamis(d).texte
+    }
+    expect(immat('CH 123456')).toBe('immat:123456')
+    expect(immat('ch-123456')).toBe('immat:123456')
+    expect(immat('123456')).toBe('immat:123456')
+    expect(immat('ABCD')).toBe('immat:ABCD') // forme inattendue : laissée telle quelle
   })
 })
 

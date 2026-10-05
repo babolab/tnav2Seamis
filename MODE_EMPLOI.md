@@ -86,10 +86,11 @@ L'outil ne traite pas les PDF. Chaque dossier de la liste **Dossiers à traiter*
 
 1. Cliquer sur **Copier la recherche** et coller la chaîne dans la recherche de Seamis pour retrouver le navire. Elle reprend les identifiants du navire séparés par une virgule, par exemple :
    ```
-   mmsi:227000001, cs:FAX0000, immat:XX00000, nom:NAVIRE A
+   mmsi:227000001, cs:FAX0000, immat:00000, nom:NAVIRE A
    ```
    - Les critères non renseignés dans le dossier sont omis.
-   - MMSI, indicatif (`cs`) et immatriculation sont écrits sans espace ; l'indicatif, l'immatriculation et le nom sont en majuscules.
+   - MMSI, indicatif (`cs`) et immatriculation sont écrits sans espace ; l'indicatif et le nom sont en majuscules.
+   - L'immatriculation est donnée sans les lettres du quartier maritime : « CH 123456 » devient `immat:123456`.
    - Si le dossier ne donne aucun identifiant du navire, la carte le signale : retrouver le navire à partir du PDF.
 2. Retrouver le PDF du dossier dans le ZIP téléchargé à l'étape 1 (le n° de dossier figure dans le nom du fichier).
 3. Le verser dans les **pièces jointes de l'entrée navire** dans Seamis.

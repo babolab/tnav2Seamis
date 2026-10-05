@@ -21,6 +21,12 @@ export interface RechercheSeamis {
 /** Identifiant : sans espace ni séparateur, en majuscules. */
 const identifiant = (v: string) => v.replace(/[\s.\-_]/g, '').toUpperCase()
 
+/** Immatriculation sans les lettres du quartier maritime : « CH 123456 » -> « 123456 ». */
+const immatriculation = (v: string) => {
+  const id = identifiant(v)
+  return id.replace(/^[A-Z]{1,3}(?=\d)/, '')
+}
+
 /** Nom : en majuscules, sans virgule (séparateur des critères), espaces simples. */
 const nom = (v: string) => v.replace(/,/g, ' ').replace(/\s+/g, ' ').trim().toUpperCase()
 
@@ -31,7 +37,7 @@ export function rechercheSeamis(d: Dossier): RechercheSeamis {
   const candidats: CritereRecherche[] = [
     { prefixe: 'mmsi', valeur: n.mmsi },
     { prefixe: 'cs', valeur: identifiant(n.indicatif) },
-    { prefixe: 'immat', valeur: identifiant(n.immatriculation) },
+    { prefixe: 'immat', valeur: immatriculation(n.immatriculation) },
     { prefixe: 'nom', valeur: nom(n.nom) },
   ]
   const criteres = candidats.filter(c => c.valeur)
