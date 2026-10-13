@@ -287,6 +287,17 @@ function Action({ numero, fait, total, children }: { numero: string; fait: numbe
   )
 }
 
+/** État d'un des deux fichiers attendus : chargé (vert, avec son nom) ou à déposer (rouge). */
+function EtatFichier({ libelle, nom }: { libelle: string; nom: string }) {
+  return (
+    <span className={cn('flex items-center gap-1.5 px-2.5 py-1 rounded-full',
+      nom ? 'bg-green-950 text-green-300' : 'bg-red-950 text-red-300')}>
+      {nom ? <Check size={12} /> : <AlertCircle size={12} />}
+      {libelle} : {nom || 'à déposer'}
+    </span>
+  )
+}
+
 function TitreSection({ classe, children }: { classe: string; children: ReactNode }) {
   return <div className={cn('border-l-4 pl-3', classe)}>{children}</div>
 }
@@ -320,6 +331,35 @@ export default function TnavModule() {
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current) }, [])
+
+  // Whole-page drop target, so the zip can be dropped after the ods even when scrolled down.
+  // Only drags carrying files are handled: dragging an attachment link out of the page is left alone.
+  const [survol, setSurvol] = useState(false)
+  const chargerRef = useRef<(fichiers: FileList) => void>(() => {})
+  useEffect(() => {
+    let profondeur = 0
+    const avecFichiers = (e: DragEvent) => !!e.dataTransfer?.types.includes('Files')
+    const entree = (e: DragEvent) => { if (avecFichiers(e)) { profondeur++; setSurvol(true) } }
+    const sortie = (e: DragEvent) => { if (avecFichiers(e) && --profondeur <= 0) { profondeur = 0; setSurvol(false) } }
+    const survole = (e: DragEvent) => { if (avecFichiers(e)) e.preventDefault() }
+    const depose = (e: DragEvent) => {
+      if (!avecFichiers(e)) return
+      e.preventDefault()
+      profondeur = 0
+      setSurvol(false)
+      if (e.dataTransfer?.files.length) chargerRef.current(e.dataTransfer.files)
+    }
+    window.addEventListener('dragenter', entree)
+    window.addEventListener('dragleave', sortie)
+    window.addEventListener('dragover', survole)
+    window.addEventListener('drop', depose)
+    return () => {
+      window.removeEventListener('dragenter', entree)
+      window.removeEventListener('dragleave', sortie)
+      window.removeEventListener('dragover', survole)
+      window.removeEventListener('drop', depose)
+    }
+  }, [])
 
   const afficherToast = (msg: string, ok = true) => {
     setToast({ msg, ok })
@@ -368,6 +408,8 @@ export default function TnavModule() {
     setChargement(false)
   }
 
+  chargerRef.current = charger
+
   const r = resultat
   const nbErreurs = r ? [...r.anomalies, ...r.entrees.flatMap(e => e.anomalies)].filter(a => a.gravite === 'erreur').length : 0
   const anomaliesParDossier = (numero: string) => r?.anomalies.filter(a => a.dossier === numero) ?? []
@@ -384,26 +426,23 @@ export default function TnavModule() {
         </p>
       </div>
 
-      {/* Zone de chargement */}
+      {/* Zone de chargement (le dépôt fonctionne aussi partout dans la page) */}
       <div
         className="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center hover:border-blue-500 transition-colors cursor-pointer"
         onClick={() => inputRef.current?.click()}
-        onDragOver={e => e.preventDefault()}
-        onDrop={e => { e.preventDefault(); charger(e.dataTransfer.files) }}
       >
         <Upload size={28} className="mx-auto text-slate-500 mb-2" />
         <p className="text-sm text-slate-300">
-          Glisser-déposer l'export démarches-simplifiées au format <strong>.ods</strong> et le <strong>.zip</strong> des pièces jointes
+          Glisser-déposer l'export démarches-simplifiées au format <strong>.ods</strong> et le <strong>.zip</strong> des pièces jointes,
+          ensemble ou l'un après l'autre, n'importe où dans la page
         </p>
         <p className="text-xs text-slate-500 mt-0.5">
           dossiers_declaration-traversee_AAAA-MM-JJ_HH-MM.ods et .zip — demander un nouvel export pour avoir des données à jour
         </p>
-        {(nomFichier || nomZip) && (
-          <p className="text-xs text-blue-300 mt-2 space-x-4">
-            {nomFichier && <span>📄 {nomFichier}</span>}
-            {nomZip && <span>🗂️ {nomZip}</span>}
-          </p>
-        )}
+        <div className="flex flex-wrap justify-center gap-3 mt-3 text-xs">
+          <EtatFichier libelle=".ods (balises et dossiers)" nom={nomFichier} />
+          <EtatFichier libelle=".zip (pièces jointes)" nom={nomZip} />
+        </div>
         <input ref={inputRef} type="file" accept=".ods,.zip" multiple className="hidden"
           onChange={e => { if (e.target.files?.length) { charger(e.target.files); e.target.value = '' } }} />
       </div>
@@ -493,6 +532,15 @@ export default function TnavModule() {
             </section>
           )}
         </>
+      )}
+
+      {/* Voile pendant le glisser-déposer de fichiers */}
+      {survol && (
+        <div className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center bg-slate-950/70 border-4 border-dashed border-blue-500">
+          <p className="flex items-center gap-2 text-lg font-semibold text-blue-200">
+            <Upload size={22} /> Déposer le .ods et/ou le .zip
+          </p>
+        </div>
       )}
 
       {/* Toast */}

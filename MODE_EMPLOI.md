@@ -22,7 +22,7 @@ Outil en ligne : <https://babolab.github.io/tnav2Seamis/>
 
 ## 2. Charger l'export dans l'outil
 
-Ouvrir l'outil et **glisser-déposer le fichier .ods et le fichier .zip** dans la zone prévue (ensemble ou l'un après l'autre), ou cliquer dessus pour les choisir.
+Ouvrir l'outil et **glisser-déposer le fichier .ods et le fichier .zip** n'importe où dans la page (ensemble ou l'un après l'autre, même après avoir fait défiler la page), ou cliquer sur la zone de dépôt pour les choisir. Sous la zone de dépôt, deux pastilles indiquent si chaque fichier est chargé (vert) ou reste à déposer (rouge).
 
 L'outil affiche alors :
 
