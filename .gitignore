@@ -1,5 +1,6 @@
 # Exports démarches-simplifiées : données personnelles, ne jamais versionner
 exemples d'exports/
+pj_utiles/
 *.csv
 *.zip
 *.pdf

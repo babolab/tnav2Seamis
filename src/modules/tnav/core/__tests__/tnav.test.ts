@@ -67,10 +67,12 @@ describe('entrées balises', () => {
       '===== TNAV 10000002 - déposée le 03/10/2026 11:33 UTC =====',
       'Navire : NAVIRE A - Chantier Modèle 30 - 9,12 m - immat. XX00000 - pavillon Français',
       'MMSI navire 227000001 - indicatif FAX0000',
+      '',
       'À bord : Prénom NOM (demandeur) - GSM 0600000000 - 1 équipier(s) déclaré(s)',
       'Départ : Cherbourg le 29/09/2026 - Arrivée : Cherbourg le 30/09/2026',
       'Trajet : Tour de la rade',
       'Contact à terre : Contact A (Travail) - 0200000000',
+      '',
       'Cette balise : EPIRB HEXID 9C7A3E1B2D4F601 / MMSI 227000001',
       'Autres balises : PLB HEXID ESSAIY75D69A4DE ; MOB AIS MMSI 227000099',
       MENTION_PDF,
@@ -109,7 +111,8 @@ describe('entrées balises', () => {
     const r = await resultatTest()
     for (const e of r.entrees) {
       for (const bloc of e.texte.split(SEPARATEUR_BLOCS)) {
-        expect(bloc.split('\n').length).toBeLessThanOrEqual(MAX_LIGNES + 2)
+        // Delimiters and blank section separators are not counted
+        expect(bloc.split('\n').filter(l => l !== '').length).toBeLessThanOrEqual(MAX_LIGNES + 2)
       }
     }
   })

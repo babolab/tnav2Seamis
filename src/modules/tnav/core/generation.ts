@@ -42,18 +42,22 @@ function personneABord(d: Dossier): string {
   return joindre([qui, gsm, equipage])
 }
 
+/** Sections du bloc, séparées par une ligne vide : 1 navire, 2 personnes et trajet, 3 balises et PDF. */
+type Section = 1 | 2 | 3
+
 /**
  * Lignes du bloc, classées par priorité décroissante (les dernières sont supprimées en premier si le
- * bloc dépasse MAX_LIGNES), chacune avec sa position d'affichage.
+ * bloc dépasse MAX_LIGNES), chacune avec sa position d'affichage et sa section.
+ * Les lignes vides entre sections ne comptent pas dans MAX_LIGNES.
  */
-function lignesBloc(d: Dossier, balise: Balise): { ordre: number; texte: string }[] {
+function lignesBloc(d: Dossier, balise: Balise): { ordre: number; section: Section; texte: string }[] {
   const n = d.navire
   const autres = d.balises.filter(b => b !== balise)
   const c = d.contactsTerre[0]
   const p = d.programme
   const com = d.communications
-  const candidates: [number, string | null][] = [
-    [1, ligne('Navire', joindre([
+  const candidates: [number, Section, string | null][] = [
+    [1, 1, ligne('Navire', joindre([
       n.nom,
       joindre([n.marque, n.modele], ' '),
       n.longueur && `${formaterNombre(n.longueur)} m`,
@@ -62,23 +66,23 @@ function lignesBloc(d: Dossier, balise: Balise): { ordre: number; texte: string 
       n.pavillon && `pavillon ${n.pavillon}`,
       n.portAttache && `port ${n.portAttache}`,
     ]))],
-    [3, ligne('À bord', personneABord(d))],
-    [7, c ? ligne('Contact à terre', joindre([
+    [3, 2, ligne('À bord', personneABord(d))],
+    [7, 2, c ? ligne('Contact à terre', joindre([
       joindre([c.nom, c.lien && `(${c.lien})`], ' '),
       c.telephone,
       c.email,
       d.contactsTerre.length > 1 && `(+${d.contactsTerre.length - 1} autre(s), voir PDF)`,
     ])) : null],
-    [8, ligne('Cette balise', decrireBalise(balise))],
-    [9, autres.length ? ligne('Autres balises', autres.map(decrireBalise).join(' ; ')) : null],
-    [10, MENTION_PDF],
-    [5, (p.portDepart || p.dateDepart || p.portArrivee || p.dateArrivee) ? joindre([
+    [8, 3, ligne('Cette balise', decrireBalise(balise))],
+    [9, 3, autres.length ? ligne('Autres balises', autres.map(decrireBalise).join(' ; ')) : null],
+    [10, 3, MENTION_PDF],
+    [5, 2, (p.portDepart || p.dateDepart || p.portArrivee || p.dateArrivee) ? joindre([
       ligne('Départ', joindre([p.portDepart, p.dateDepart && `le ${formaterDateJour(p.dateDepart)}`], ' ')),
       ligne('Arrivée', joindre([p.portArrivee, p.dateArrivee && `le ${formaterDateJour(p.dateArrivee)}`], ' ')),
     ]) : null],
-    [6, ligne('Trajet', p.trajet && tronquer(p.trajet, MAX_TEXTE_LIBRE))],
-    [2, joindre([n.mmsi && `MMSI navire ${n.mmsi}`, n.indicatif && `indicatif ${n.indicatif}`]) || null],
-    [4, ligne('Autres moyens', joindre([
+    [6, 2, ligne('Trajet', p.trajet && tronquer(p.trajet, MAX_TEXTE_LIBRE))],
+    [2, 1, joindre([n.mmsi && `MMSI navire ${n.mmsi}`, n.indicatif && `indicatif ${n.indicatif}`]) || null],
+    [4, 2, ligne('Autres moyens', joindre([
       com.iridium && `Iridium/sat. ${com.iridium}`,
       com.internetSatellite && `Internet sat. ${com.internetSatellite}`,
       com.autres && tronquer(com.autres, 40),
@@ -86,17 +90,25 @@ function lignesBloc(d: Dossier, balise: Balise): { ordre: number; texte: string 
     ]))],
   ]
   return candidates
-    .filter((l): l is [number, string] => !!l[1])
+    .filter((l): l is [number, Section, string] => !!l[2])
     .slice(0, MAX_LIGNES)
     .sort((a, b) => a[0] - b[0])
-    .map(([ordre, texte]) => ({ ordre, texte }))
+    .map(([ordre, section, texte]) => ({ ordre, section, texte }))
 }
 
 /** Bloc de texte complet (délimiteurs compris) pour une balise d'un dossier. */
 export function texteBloc(d: Dossier, balise: Balise): string {
   const ouverture = `===== TNAV ${d.numero}${d.dateDepot ? ` - déposée le ${formaterDateHeureUtc(d.dateDepot)}` : ''} =====`
   const fermeture = `===== fin TNAV ${d.numero} =====`
-  return [ouverture, ...lignesBloc(d, balise).map(l => l.texte), fermeture].join('\n')
+  const corps: string[] = []
+  let sectionPrecedente: Section | null = null
+  for (const l of lignesBloc(d, balise)) {
+    // Blank line between sections, for readability in Seamis
+    if (sectionPrecedente !== null && l.section !== sectionPrecedente) corps.push('')
+    corps.push(l.texte)
+    sectionPrecedente = l.section
+  }
+  return [ouverture, ...corps, fermeture].join('\n')
 }
 
 /** Dossiers à traiter : case « Entré dans Seamis? » non cochée et dossier non archivé. */

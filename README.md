@@ -13,12 +13,13 @@ Les plaisanciers déclarent leur traversée sur démarches-simplifiées : navire
 - ne retient que les dossiers dont la case **« Entré dans Seamis? »** n'est pas cochée, et ignore les dossiers archivés ;
 - génère **une entrée par identifiant de balise** : une balise qui a un HEXID et un MMSI donne deux entrées au même texte ;
 - normalise les clés (aucun espace, HEXID en majuscules, MMSI en chiffres seuls) ;
-- produit un texte court (10 lignes au plus) encadré par des délimiteurs portant le n° de dossier, pour pouvoir empiler les mises à jour dans Seamis ;
-- fournit pour chaque dossier la chaîne de recherche du navire dans Seamis (`mmsi:…, cs:…, immat:…, nom:…`), à copier pour y verser le PDF ;
-- suit l'avancement des actions à faire (entrées balises saisies, PDF versés, cases cochées dans démarches-simplifiées), sans rien enregistrer ;
+- produit un texte court (10 lignes au plus) en trois parties séparées par une ligne vide (navire ; personnes et trajet ; balises), encadré par des délimiteurs portant le n° de dossier, pour pouvoir empiler les mises à jour dans Seamis ;
+- fournit pour chaque dossier la chaîne de recherche du navire dans Seamis (`mmsi:…, cs:…, immat:…, nom:…`) et un lien vers le référentiel navires ;
+- lit le **.zip** de l'export et rattache à chaque dossier son PDF et ses pièces jointes (n° de dossier lu dans le nom du sous-dossier), proposés au téléchargement pour être versés au navire ;
+- suit l'avancement des actions à faire (entrées balises saisies, pièces jointes versées, cases cochées dans démarches-simplifiées), sans rien enregistrer ;
 - signale les anomalies sans bloquer : HEXID ou MMSI invalide, préfixe AIS inattendu, pavillon incohérent avec le MID du MMSI, dossier sans balise, absence de contact à terre…
 
-L'outil ne traite pas les PDF et ne coche pas la case « Entré dans Seamis? » : ces deux étapes restent manuelles.
+Le versement des pièces jointes dans Seamis et le cochage de la case « Entré dans Seamis? » restent manuels.
 
 ## Confidentialité
 
@@ -60,6 +61,7 @@ src/
         ├── controles.ts         contrôles de cohérence (anomalies)
         ├── generation.ts        clés, textes, fusion des dossiers qui partagent une clé
         ├── recherche.ts         chaîne de recherche du navire dans Seamis
+        ├── piecesJointes.ts     lecture du zip, pièces jointes par n° de dossier
         ├── types.ts             modèle de données
         └── __tests__/           tests, export ods fabriqué et anonymisé
 ```
