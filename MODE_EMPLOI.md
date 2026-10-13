@@ -64,26 +64,31 @@ Si la copie échoue (message rouge), sélectionner le texte à la main et le cop
 
 ```
 ===== TNAV 10000002 - déposée le 03/10/2026 11:33 UTC =====
-Navire : NAVIRE A - J boats J92 - 9,12 m - immat. XX00000 - pavillon Français
-MMSI navire 227000001 - indicatif FAX0000
+Navire : NAVIRE A
+Modèle : J boats J92
+Longueur : 9,12 m
+Immatriculation : XX00000
+Pavillon : Français
+MMSI navire : 227000001
+Indicatif : FAX0000
 
 À bord : Prénom NOM (demandeur) - GSM 0600000000
 Départ : Cherbourg le 29/09/2026 - Arrivée : Cherbourg le 30/09/2026
 Trajet : Tour de la rade
 Contact à terre : CROSS Jobourg (Travail) - 0233521616
 
-Cette balise : EPIRB HEXID ESSAI7GRE659ZSD / MMSI 227123456
-Autres balises : PLB HEXID ESSAIY75D69A4DE ; MOB AIS MMSI 227123789
+Autre balise : PLB HEXID ESSAIY75D69A4DE
+Autre balise : MOB AIS MMSI 227123789
 Détails complets : consulter le PDF de la démarche déposée (fiche navire Seamis) ou le demander au CROSS Jobourg.
 ===== fin TNAV 10000002 =====
 ```
 
 - Les lignes `=====` encadrent chaque déclaration et portent le n° de dossier. Dans Seamis, la déclaration la plus récente est toujours en haut.
-- Le texte est découpé en trois parties séparées par une ligne vide : **le navire**, **les personnes et le trajet**, **les balises et le renvoi au PDF**.
+- Le texte est découpé en trois parties séparées par une ligne vide : **le navire**, **les personnes et le trajet**, **les autres balises et le renvoi au PDF**. Chaque information du navire et chaque autre balise du dossier occupe sa propre ligne. La balise de l'entrée n'est pas répétée : c'est la clé.
 - La date de dépôt est en **UTC**. Les dates du programme sont au format JJ/MM/AAAA.
 - « À bord » cite le chef de bord déclaré dans l'équipage, à défaut le demandeur du dossier.
 - Un seul contact à terre est cité ; s'il y en a d'autres, la ligne se termine par « (+N autres, voir PDF) ».
-- Le texte est limité à 10 lignes (lignes vides non comptées) : les informations les moins utiles (autres moyens de communication, indicatif…) peuvent être omises. L'équipage complet et le détail sont dans le **PDF du dossier**.
+- Le texte est limité à 25 lignes (lignes vides non comptées) : au-delà, les informations les moins utiles (description de la coque, port d'attache, autres moyens de communication…) sont omises. L'équipage complet et le détail sont dans le **PDF du dossier**.
 
 ### Plusieurs dossiers pour la même balise
 

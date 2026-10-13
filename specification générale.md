@@ -97,7 +97,7 @@ Afin d'être plus rapidement et efficacement expoitables, ces informations ont e
 - L'équipage complet n'est pas repris, il reste consultable dans le PDF joint au navire.
 
 ### Format du texte (version courte, première itération)
-- **10 lignes maximum entre les délimiteurs**, soit 12 lignes au plus avec ceux-ci.
+- **25 lignes maximum entre les délimiteurs** (lignes vides entre parties non comptées), une information par ligne. Plafond relevé de 10 à 25 le 13/10/2026 à la demande des opérateurs.
 - Une ligne n'est écrite que si elle a au moins une valeur. Dans une ligne, les éléments vides sont omis, sans « / » ni « ? ».
 - Les textes libres longs (détail du trajet, description de la coque) sont tronqués avec « … » pour tenir sur une ligne (environ 100 caractères, à ajuster).
 - Si plusieurs contacts à terre sont déclarés, seul le premier figure sur sa ligne, suivi de « (+N autres, voir PDF) ».

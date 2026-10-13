@@ -13,7 +13,7 @@ Les plaisanciers déclarent leur traversée sur démarches-simplifiées : navire
 - ne retient que les dossiers dont la case **« Entré dans Seamis? »** n'est pas cochée, et ignore les dossiers archivés ;
 - génère **une entrée par identifiant de balise** : une balise qui a un HEXID et un MMSI donne deux entrées au même texte ;
 - normalise les clés (aucun espace, HEXID en majuscules, MMSI en chiffres seuls) ;
-- produit un texte court (10 lignes au plus) en trois parties séparées par une ligne vide (navire ; personnes et trajet ; balises), encadré par des délimiteurs portant le n° de dossier, pour pouvoir empiler les mises à jour dans Seamis ;
+- produit un texte (25 lignes au plus, une information par ligne) en trois parties séparées par une ligne vide (navire ; personnes et trajet ; autres balises), encadré par des délimiteurs portant le n° de dossier, pour pouvoir empiler les mises à jour dans Seamis ;
 - fournit pour chaque dossier la chaîne de recherche du navire dans Seamis (`mmsi:…, cs:…, immat:…, nom:…`) et un lien vers le référentiel navires ;
 - lit le **.zip** de l'export et rattache à chaque dossier son PDF et ses pièces jointes (n° de dossier lu dans le nom du sous-dossier), proposés au téléchargement pour être versés au navire ;
 - suit l'avancement des actions à faire (entrées balises saisies, pièces jointes versées, cases cochées dans démarches-simplifiées), sans rien enregistrer ;

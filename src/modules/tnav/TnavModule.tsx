@@ -42,8 +42,8 @@ const STYLE_GRAVITE: Record<Anomalie['gravite'], { classe: string; Icone: typeof
 
 /** Couleurs propres à chaque section, pour les distinguer d'un coup d'œil. */
 const SECTIONS = {
-  balises: { titre: 'text-sky-300 border-sky-500', carte: 'border-sky-800/70', pastille: 'bg-sky-800 text-sky-100' },
-  navires: { titre: 'text-amber-300 border-amber-500', carte: 'border-amber-800/70', pastille: 'bg-amber-700 text-amber-50' },
+  balises: { titre: 'text-sky-300 border-sky-500', fond: 'bg-sky-950/50 border-sky-800', carte: 'border-sky-800/70', pastille: 'bg-sky-800 text-sky-100' },
+  navires: { titre: 'text-amber-300 border-amber-500', fond: 'bg-amber-950/40 border-amber-800', carte: 'border-amber-800/70', pastille: 'bg-amber-700 text-amber-50' },
 }
 
 function ListeAnomalies({ anomalies, avecDossier = false }: { anomalies: Anomalie[]; avecDossier?: boolean }) {
@@ -487,7 +487,7 @@ export default function TnavModule() {
           </div>
 
           {/* 1. Balises */}
-          <section className="space-y-3">
+          <section className={cn('space-y-3 rounded-2xl border-2 p-4', SECTIONS.balises.fond)}>
             <TitreSection classe={SECTIONS.balises.titre}>
               <h2 className="text-2xl font-bold">1. Balises Seamis ({r.entrees.length})</h2>
             </TitreSection>
@@ -501,7 +501,7 @@ export default function TnavModule() {
           </section>
 
           {/* 2. Navires */}
-          <section className="space-y-3">
+          <section className={cn('space-y-3 rounded-2xl border-2 p-4', SECTIONS.navires.fond)}>
             <div className="flex flex-wrap items-center gap-3">
               <TitreSection classe={SECTIONS.navires.titre}>
                 <h2 className="text-2xl font-bold">2. Navires Seamis ({r.dossiersATraiter.length})</h2>
