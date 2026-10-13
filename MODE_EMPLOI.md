@@ -64,26 +64,27 @@ Si la copie échoue (message rouge), sélectionner le texte à la main et le cop
 
 ```
 ===== TNAV 10000002 - déposée le 03/10/2026 11:33 UTC =====
-Navire : NAVIRE A
-Modèle : J boats J92
-Longueur : 9,12 m
-Immatriculation : XX00000
-Pavillon : Français
-MMSI navire : 227000001
-Indicatif : FAX0000
+NAVIRE : NAVIRE A
+MODÈLE : J boats J92
+LONGUEUR : 9,12 m
+IMMATRICULATION : XX00000
+PAVILLON : Français
+MMSI NAVIRE : 227000001
+INDICATIF : FAX0000
 
-À bord : Prénom NOM (demandeur) - GSM 0600000000
-Départ : Cherbourg le 29/09/2026 - Arrivée : Cherbourg le 30/09/2026
-Trajet : Tour de la rade
-Contact à terre : CROSS Jobourg (Travail) - 0233521616
+À BORD : Prénom NOM (demandeur) - GSM 0600000000
+DÉPART : Cherbourg le 29/09/2026 - ARRIVÉE : Cherbourg le 30/09/2026
+TRAJET : Tour de la rade
+CONTACT À TERRE : CROSS Jobourg (Travail) - 0233521616
 
-Autre balise : PLB HEXID ESSAIY75D69A4DE
-Autre balise : MOB AIS MMSI 227123789
-Détails complets : consulter le PDF de la démarche déposée (fiche navire Seamis) ou le demander au CROSS Jobourg.
+AUTRE BALISE : PLB HEXID ESSAIY75D69A4DE
+AUTRE BALISE : MOB AIS MMSI 227123789
+DÉTAILS COMPLETS : consulter le PDF de la démarche déposée (fiche navire Seamis) ou le demander au CROSS Jobourg.
 ===== fin TNAV 10000002 =====
 ```
 
 - Les lignes `=====` encadrent chaque déclaration et portent le n° de dossier. Dans Seamis, la déclaration la plus récente est toujours en haut.
+- Chaque ligne commence par son libellé en MAJUSCULES, pour une lecture rapide.
 - Le texte est découpé en trois parties séparées par une ligne vide : **le navire**, **les personnes et le trajet**, **les autres balises et le renvoi au PDF**. Chaque information du navire et chaque autre balise du dossier occupe sa propre ligne. La balise de l'entrée n'est pas répétée : c'est la clé.
 - La date de dépôt est en **UTC**. Les dates du programme sont au format JJ/MM/AAAA.
 - « À bord » cite le chef de bord déclaré dans l'équipage, à défaut le demandeur du dossier.

@@ -10,7 +10,7 @@ export const MAX_LIGNES = 25
 export const MAX_TEXTE_LIBRE = 100
 
 export const MENTION_PDF =
-  'Détails complets : consulter le PDF de la démarche déposée (fiche navire Seamis) ou le demander au CROSS Jobourg.'
+  'DÉTAILS COMPLETS : consulter le PDF de la démarche déposée (fiche navire Seamis) ou le demander au CROSS Jobourg.'
 
 /** Statuts à bord désignant le responsable du navire. */
 const STATUT_CHEF = /chef|skipper|capitaine|patron|responsable/i
@@ -18,8 +18,8 @@ const STATUT_CHEF = /chef|skipper|capitaine|patron|responsable/i
 const joindre = (morceaux: (string | false | undefined | null)[], separateur = ' - ') =>
   morceaux.filter(Boolean).join(separateur)
 
-/** Ligne « libellé : contenu », ou null si le contenu est vide. */
-const ligne = (libelle: string, contenu: string) => (contenu ? `${libelle} : ${contenu}` : null)
+/** Ligne « LIBELLÉ : contenu » (libellé en majuscules pour une lecture rapide), ou null si le contenu est vide. */
+const ligne = (libelle: string, contenu: string) => (contenu ? `${libelle.toUpperCase()} : ${contenu}` : null)
 
 export function decrireBalise(b: Balise): string {
   return joindre([b.type || 'Balise', b.hexId && `HEXID ${b.hexId}`, b.mmsi && `MMSI ${b.mmsi}`], ' ')
