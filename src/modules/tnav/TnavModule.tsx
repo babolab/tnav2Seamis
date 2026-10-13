@@ -450,7 +450,7 @@ export default function TnavModule() {
           {/* 1. Balises */}
           <section className="space-y-3">
             <TitreSection classe={SECTIONS.balises.titre}>
-              <h2 className="text-2xl font-bold">1. Balises à saisir ({r.entrees.length})</h2>
+              <h2 className="text-2xl font-bold">1. Balises Seamis ({r.entrees.length})</h2>
             </TitreSection>
             {r.entrees.length === 0 && (
               <p className="text-sm text-slate-400">Aucune balise à saisir dans les dossiers à traiter.</p>
@@ -465,7 +465,7 @@ export default function TnavModule() {
           <section className="space-y-3">
             <div className="flex flex-wrap items-center gap-3">
               <TitreSection classe={SECTIONS.navires.titre}>
-                <h2 className="text-2xl font-bold">2. Navires : pièces jointes à verser ({r.dossiersATraiter.length})</h2>
+                <h2 className="text-2xl font-bold">2. Navires Seamis ({r.dossiersATraiter.length})</h2>
               </TitreSection>
               {r.dossiersATraiter.length > 0 && (
                 <BoutonCopier texte={r.dossiersATraiter.map(d => d.numero).join('\n')} libelle="Copier les n° de démarche" onCopie={surCopie} />

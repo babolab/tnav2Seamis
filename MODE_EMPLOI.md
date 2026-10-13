@@ -38,7 +38,7 @@ Tous les états de dossier sont traités (en construction, en instruction, accep
 
 Le cadre **Actions à faire** rappelle les étapes (1 balises, 2a pièces jointes des navires, 2b case démarches-simplifiées) et suit votre avancement d'après les cases que vous cochez sur les cartes. Une étape reste **rouge** tant qu'il reste à faire et passe au **vert** une fois terminée.
 
-La page comporte ensuite deux parties de couleurs différentes : **1. Balises à saisir** (bleu) et **2. Navires : pièces jointes à verser** (orange).
+La page comporte ensuite deux parties de couleurs différentes : **1. Balises Seamis** (bleu) et **2. Navires Seamis** (orange).
 
 ## 3. Saisir les entrées dans le référentiel balises de Seamis
 
@@ -91,7 +91,7 @@ Une mise à jour de traversée arrive sous la forme d'un **nouveau dossier**. Si
 
 ## 4. Verser le PDF et les pièces jointes au navire
 
-Chaque dossier à traiter a sa carte dans la partie **2. Navires**, avec le nom du navire en gros à gauche et le n° de démarche à droite. Pour chacun :
+Chaque dossier à traiter a sa carte dans la partie **2. Navires Seamis**, avec le nom du navire en gros à gauche et le n° de démarche à droite. Pour chacun :
 
 1. **Copier la recherche**, puis **ouvrir le référentiel navires** et y coller la chaîne pour retrouver le navire. Elle reprend les identifiants du navire séparés par une virgule, par exemple :
    ```
